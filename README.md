@@ -1,9 +1,6 @@
 # clipchat
 
-Clojure wrappers around the HipChat API.
-
-https://www.hipchat.com/docs/api/
-
+Clojure wrapper around the [HipChat v1 REST API](https://developer.atlassian.com/hipchat/guide/hipchat-rest-api).
 
 
 ## License
