@@ -25,28 +25,21 @@
       :key-fn keyword))))
 
 
-(defn message [auth-token {room_id :room_id
-                           from :from
-                           message :message
-                           notify :notify
-                           color :color :as opts }]
+(defn message [auth-token {:keys [room_id from message notify color] :as opts} & [hostname]]
   (doall
-   (map (fn [v]
-          (if (nil? (get opts v))
-            (throw (java.lang.Exception. (str "Missing argument: " v)))))
+   (map #(if (nil? (get opts %))
+          (throw (java.lang.Exception. (str "Missing argument: " %))))
         [:room_id :from :message]))
-  (let [{:keys [room_id from message notify color]
-         :or {notify 0 color "yellow"}} opts
-         url (str api-url
-                  "/rooms/message?"
-                  (client/generate-query-string
-                   {"format" "json" "auth_token" auth-token}))
-         body (client/generate-query-string
-               (assoc opts :auth_token auth-token :format "json"))]
+  (let [{:keys [notify color] :or {notify 0 color "yellow"}} opts
+        url (if (seq hostname)
+              (str hostname "/v1/rooms/message")
+              (str api-url "/rooms/message"))
+        body (client/generate-query-string
+              (assoc opts :auth_token auth-token :format "json"))]
     (:status
      (json/read-str
       (:body
-       (client/post (str api-url "/rooms/message") (setup-call-body body)))
+       (client/post url (setup-call-body body)))
       :key-fn keyword))))
 
 (defn show [auth-token {room_id :room_id :as opts}]
